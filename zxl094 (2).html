@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福州地铁</title>
+    <style>
+       html, body {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        .header {
+            height: 60px;
+            background: #f8f9fa;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .basemap-thumbnail {
+            width: 120px;
+            height: 80px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .basemap-thumbnail:hover {
+            border-color: #0079c1;
+        }        
+        .basemap-gallery {
+            height: 100px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+            overflow-x: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.32/"></script>
+    <script type="module" src="https://js.arcgis.com/map-components/4.32/arcgis-map-components.esm.js"></script>
+    <script type="module" src="https://js.arcgis.com/calcite-components/3.0.3/calcite.esm.js"></script>
+</head>
+
+<body>
+    <header class="header">
+        <h1 style="margin: 0;">福州地铁</h1>
+    </header>
+
+    <div class="map-container">
+        <arcgis-map 
+            item-id="41281c51f9de45edaf1c8ed44bb10e30"
+            zoom="10" 
+            center="119.296, 26.074"
+            basemap="streets-vector"
+        >
+
+            <arcgis-search position="top-right"></arcgis-search>
+            <arcgis-layer-list position="top-right"></arcgis-layer-list>
+            <arcgis-legend position="bottom-right"></arcgis-legend>
+            <arcgis-scale-bar position="bottom-left"></arcgis-scale-bar>
+            <arcgis-zoom position="top-left"></arcgis-zoom>
+        </arcgis-map>
+    </div>
+
+    <script>
+        require([
+            "esri/layers/FeatureLayer", 
+            "esri/Basemap",          
+            "esri/layers/TileLayer"  
+        ], (FeatureLayer, Basemap, TileLayer) => {
+            
+            const arcgisMap = document.querySelector("arcgis-map");
+            
+            arcgisMap.addEventListener("arcgisViewReadyChange", () => {
+                const citiesLayer = new FeatureLayer({
+                    url: "https://www.geosceneonline.cn/server/rest/services/Hosted/福州地铁/FeatureServer/0",
+                    title: "福州地铁线路" 
+                });
+                
+                const basemap = new Basemap({
+                    baseLayers: [
+                        new TileLayer({
+                            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer",
+                            title: "World Topographic" 
+                        })
+                    ],
+                    title: "Topographic", 
+                    id: "topo"            
+                });
+                arcgisMap.map.add(citiesLayer);
+        });
+
+        document.querySelectorAll(".basemap-thumbnail").forEach(thumbnail => {
+            thumbnail.addEventListener("click", () => {
+                const basemapId = thumbnail.dataset.basemap;
+                mapElement.basemap = basemapId;
+            });
+        });
+    });
+</script>
+</body>
+</html>
